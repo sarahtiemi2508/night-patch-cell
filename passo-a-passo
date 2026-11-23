@@ -1,0 +1,109 @@
+Exercício: o que cada método precisa fazer
+Para cada método, descrevo a responsabilidade, o que ele recebe e devolve e as regras que precisa respeitar. A implementação fica com o Driver.
+1. MemoriaDeCombate
+Construtor MemoriaDeCombate()
+
+    Inicializa o historico como uma lista vazia.
+    Pergunta para o grupo: o que acontece se o construtor não criar a lista e alguém chamar registrar?
+
+registrar(evento: String): void
+
+    Adiciona um evento (por exemplo, "Assassin usou stealth") ao final do histórico.
+    Não devolve nada.
+    Decidam o que fazer com texto nulo ou vazio (ignorar, aceitar ou rejeitar) e justifiquem.
+
+ultimoEvento(): String
+
+    Devolve o evento mais recente registrado.
+    Atenção ao caso limite: com o histórico vazio, não pode quebrar o programa. Decidam o que devolver (null, texto padrão como "sem eventos").
+
+tamanho(): int
+
+    Devolve quantos eventos já foram registrados.
+    Serve para provar, no Main, que a memória foi realmente usada pelo specter.
+
+2. SpecterIA (classe abstrata)
+Construtor SpecterIA(nome, memoria)
+
+    Guarda o nome e a memória recebida (é aqui que a composição acontece).
+    Define a energia inicial em 100, sem receber esse valor de fora.
+    Reflexão: por que a memória entra pelo construtor em vez de ser criada dentro da classe? Qual vantagem isso traz?
+
+executarTurno(): void (abstrato)
+
+    Não tem corpo na classe base. Só declara o contrato: todo specter precisa saber executar um turno.
+    Pergunta para o grupo: por que não faz sentido escrever uma implementação padrão aqui?
+
+receberDano(valor: int): void
+
+    Diminui a energia pelo valor recebido.
+    Regra 1: valor negativo não pode ser aceito, senão o dano viraria cura.
+    Regra 2: a energia nunca pode ficar abaixo de 0.
+    É o método que protege o invariante de energia. Esse é o argumento do encapsulamento na apresentação.
+
+estaAtivo(): boolean
+
+    Responde se o specter ainda pode lutar.
+    A regra é derivada da energia (maior que zero). Não crie um atributo novo para isso.
+
+getNome(): String
+
+    Devolve o nome. Não há setter: pensem por que o nome não deveria mudar depois de criado.
+
+getEnergia(): int
+
+    Só leitura. Não existe setEnergia, porque a única forma de alterar a energia é receberDano.
+
+getMemoria(): MemoriaDeCombate (protegido)
+
+    Dá acesso à memória apenas para as subclasses.
+    Pergunta para o grupo: o que aconteceria com o encapsulamento se esse método fosse público?
+
+3. Subclasses
+Todas seguem o mesmo padrão nos dois métodos.
+Construtor (nome, memoria)
+
+    Apenas repassa os dois valores para o construtor da classe pai.
+    Não duplica a lógica de inicialização.
+
+executarTurno(): void (marcado com @Override)
+
+    Cada subclasse faz duas coisas: mostra no console uma ação diferente das outras e registra esse evento na memória, usando o acesso permitido pela classe pai.
+    É esse segundo passo que prova que a composição é usada, e não só declarada.
+
+Comportamentos sugeridos (as mensagens são com vocês):
+Subclasse
+	
+Estilo do turno
+WardenSpecter
+	
+Controla o ritmo, defensivo. Pode, por exemplo, registrar "segurou a linha".
+AssassinSpecter
+	
+Some e volta com um combo explosivo.
+OverclockSpecter (bônus)
+	
+Arrisca tudo pela velocidade. Desafio extra: pode causar dano a si mesmo via receberDano.
+4. Main
+
+    Cria um array do tipo base SpecterIA com instâncias de subclasses diferentes, cada uma com sua própria MemoriaDeCombate.
+    Percorre o array com um for indexado e chama executarTurno() em cada posição.
+    Depois do laço, mostra o tamanho() da memória de cada specter para provar a composição.
+    Deve conseguir demonstrar, sem explicar muito, que o mesmo comando gera comportamentos diferentes.
+
+Perguntas para o Coach usar no ensaio
+
+    Onde está o polimorfismo neste código? Aponte a linha.
+    Se criarmos um HackerSpecter amanhã, qual código existente precisa mudar? (A resposta esperada é: nenhum.)
+    Por que SpecterIA não pode herdar de MemoriaDeCombate?
+    O que impede alguém de deixar a energia em 500 ou -20?
+
+Ordem sugerida de implementação
+
+    MemoriaDeCombate
+    SpecterIA
+    Uma subclasse, testada no Main
+    As demais subclasses
+    Ajustes e commits
+
+Quando o Driver terminar cada etapa, posso revisar o código do grupo e apontar o que falta nos requisitos, sem entregar o código pronto.
